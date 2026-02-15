@@ -125,7 +125,7 @@ const App = () => {
           {!user ? (
             <div className="login-prompt glass-panel">
               <p>Authentication Required for Admin Tools</p>
-              <button className="btn-spotify" onClick={() => setShowLogin(true)}>LOGIN AS MASTERMAD</button>
+              <button className="btn-spotify" onClick={() => setShowLogin(true)}>ACCESS SYSTEM</button>
             </div>
           ) : (
             <div className="admin-tools">
@@ -298,7 +298,7 @@ const App = () => {
           </button>
           <button className="nav-btn" onClick={() => user ? setUser(null) : setShowLogin(true)}>
             <span className="nav-icon">{user ? '🔓' : '👤'}</span>
-            <span className="nav-label">{user ? 'Logout' : 'Login'}</span>
+            <span className="nav-label">{user ? 'Exit' : 'Admin'}</span>
           </button>
         </div>
       </nav>
