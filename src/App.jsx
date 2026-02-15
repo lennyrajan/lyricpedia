@@ -73,7 +73,8 @@ const App = () => {
   };
 
   // In production, this would be your worker URL
-  const WORKER_URL = 'https://lyriverse-api.lennyrajan.workers.dev';
+  // PASTE YOUR WORKER URL HERE (from the terminal after running 'npx wrangler deploy')
+  const WORKER_URL = 'https://lyriverse-brain.YOUR_USERNAME.workers.dev';
 
   const startReindexing = async () => {
     setIsIndexing(true);
