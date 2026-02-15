@@ -77,37 +77,32 @@ const App = () => {
     }
   };
 
-  const startReindexing = () => {
+  // In production, this would be your worker URL
+  const WORKER_URL = 'https://lyriverse-api.lennyrajan.workers.dev';
+
+  const startReindexing = async () => {
     setIsIndexing(true);
     setIndexingLogs(['Initiating remote discovery engine...']);
 
-    // Connect to native bridge
-    const eventSource = new EventSource('http://localhost:3001/api/index');
-
-    eventSource.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.type === 'log') {
-        setIndexingLogs(prev => [...prev, data.message]);
-      } else if (data.type === 'error') {
-        setIndexingLogs(prev => [...prev, `[ERROR] ${data.message}`]);
-      } else if (data.type === 'done') {
-        setIndexingLogs(prev => [...prev, '--- Indexing Complete ---']);
-        setIsIndexing(false);
-        eventSource.close();
-        fetchReport();
+    try {
+      const res = await fetch(`${WORKER_URL}/api/index`, { method: 'POST' });
+      if (res.ok) {
+        setIndexingLogs(prev => [...prev, '--- Indexing Triggered Successfully ---', 'The Cloud Scraper is now running in the background.', 'Updates will reflect in ~2 minutes.']);
+        // Poll for report after a delay
+        setTimeout(fetchReport, 5000);
+      } else {
+        throw new Error('Trigger failed');
       }
-    };
-
-    eventSource.onerror = () => {
-      setIndexingLogs(prev => [...prev, '[BRIDGE] Connection failed. Ensure server.js is running.']);
+    } catch (e) {
+      setIndexingLogs(prev => [...prev, '[ERROR] Could not connect to Cloud Worker. Ensure Worker is deployed.']);
+    } finally {
       setIsIndexing(false);
-      eventSource.close();
-    };
+    }
   };
 
   const fetchReport = async () => {
     try {
-      const res = await fetch('http://localhost:3001/api/report');
+      const res = await fetch(`${WORKER_URL}/api/report`);
       if (res.ok) {
         const data = await res.json();
         setAdminReport(data);
@@ -130,20 +125,21 @@ const App = () => {
           ) : (
             <div className="admin-tools">
               <div className="dashboard-card glass-panel">
-                <h3>Discovery Management</h3>
-                <p>Trigger a full sweep of the latest trends.</p>
+                <h3>Cloud Discovery Management</h3>
+                <p>Trigger an autonomous sweep of the latest trends.</p>
+                <div className="status-badge">SELF-CONTAINED (CLOUDFLARE)</div>
                 <button
                   className="btn-spotify"
                   onClick={startReindexing}
                   disabled={isIndexing}
                 >
-                  {isIndexing ? 'INDEXING...' : 'INVOKE FULL INDEX'}
+                  {isIndexing ? 'TRIGGERING...' : 'INVOKE CLOUD INDEX'}
                 </button>
               </div>
 
               {indexingLogs.length > 0 && (
                 <div className="log-viewer glass-panel">
-                  <h4>Indexing Progress</h4>
+                  <h4>Cloud Execution Status</h4>
                   <div className="logs-container">
                     {indexingLogs.map((log, i) => <div key={i} className="log-line">{log}</div>)}
                   </div>
@@ -152,7 +148,7 @@ const App = () => {
 
               {adminReport && (
                 <div className="report-card glass-panel">
-                  <h4>Admin Discovery Report</h4>
+                  <h4>Cloud Discovery Report</h4>
                   <div className="stats-grid">
                     <div className="stat-item">
                       <span className="s-label">SCANNED</span>
@@ -163,11 +159,11 @@ const App = () => {
                       <span className="s-value">{adminReport.enriched}</span>
                     </div>
                     <div className="stat-item">
-                      <span className="s-label">FAILED</span>
-                      <span className="s-value">{adminReport.failed}</span>
+                      <span className="s-label">DURATION</span>
+                      <span className="s-value">{Math.round(adminReport.durationSeconds)}s</span>
                     </div>
                   </div>
-                  <p className="report-meta">Run completed at: {new Date(adminReport.endTime).toLocaleString()}</p>
+                  <p className="report-meta">Last cloud run: {new Date(adminReport.endTime).toLocaleString()}</p>
                 </div>
               )}
             </div>
@@ -474,6 +470,20 @@ const App = () => {
 
         .dashboard-card {
           padding: var(--space-lg);
+          position: relative;
+        }
+
+        .status-badge {
+          position: absolute;
+          top: var(--space-md);
+          right: var(--space-md);
+          background: var(--accent);
+          color: white;
+          font-size: 0.6rem;
+          font-weight: 900;
+          padding: 4px 8px;
+          border-radius: 6px;
+          letter-spacing: 1px;
         }
 
         .log-viewer {

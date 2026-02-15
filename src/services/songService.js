@@ -5,56 +5,68 @@
 
 import MOCK_SONGS from '../data/music-graph.json';
 
+// In production, this would be your worker URL
+const WORKER_URL = 'https://lyriverse-api.lennyrajan.workers.dev';
+
+async function fetchFromWorker(path, fallback) {
+    try {
+        const res = await fetch(`${WORKER_URL}${path}`);
+        if (res.ok) return await res.json();
+    } catch (e) {
+        console.warn(`Worker API ${path} failed, using local fallback.`, e);
+    }
+    return fallback;
+}
+
 export const songService = {
     getTrending: async () => {
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 500));
-        return MOCK_SONGS.slice(0, 5);
+        const songs = await fetchFromWorker('/api/songs', MOCK_SONGS);
+        return songs.slice(0, 5);
     },
 
     getNewReleases: async (page = 0, limit = 10) => {
-        await new Promise(resolve => setTimeout(resolve, 300));
+        const songs = await fetchFromWorker('/api/songs', MOCK_SONGS);
         const start = page * limit;
-        return [...MOCK_SONGS].reverse().slice(start, start + limit);
+        return [...songs].reverse().slice(start, start + limit);
     },
 
     getSongById: async (id) => {
-        await new Promise(resolve => setTimeout(resolve, 200));
-        return MOCK_SONGS.find(s => s.id === id);
+        const songs = await fetchFromWorker('/api/songs', MOCK_SONGS);
+        return songs.find(s => s.id === id);
     },
 
     searchSongs: async (query) => {
-        await new Promise(resolve => setTimeout(resolve, 400));
+        const songs = await fetchFromWorker('/api/songs', MOCK_SONGS);
         const q = query.toLowerCase();
-        return MOCK_SONGS.filter(s =>
+        return songs.filter(s =>
             s.title.toLowerCase().includes(q) ||
             s.artist.toLowerCase().includes(q)
         );
     },
 
     getArtistSongs: async (artistName) => {
-        await new Promise(resolve => setTimeout(resolve, 300));
-        return MOCK_SONGS.filter(s => s.artist.toLowerCase().includes(artistName.toLowerCase()));
+        const songs = await fetchFromWorker('/api/songs', MOCK_SONGS);
+        return songs.filter(s => s.artist.toLowerCase().includes(artistName.toLowerCase()));
     },
 
     getAlbumSongs: async (albumName) => {
-        await new Promise(resolve => setTimeout(resolve, 300));
-        return MOCK_SONGS.filter(s => s.album?.toLowerCase() === albumName.toLowerCase());
+        const songs = await fetchFromWorker('/api/songs', MOCK_SONGS);
+        return songs.filter(s => s.album?.toLowerCase() === albumName.toLowerCase());
     },
 
     getSongsByLanguage: async (lang) => {
-        await new Promise(resolve => setTimeout(resolve, 300));
-        return MOCK_SONGS.filter(s => s.language?.toLowerCase() === lang.toLowerCase());
+        const songs = await fetchFromWorker('/api/songs', MOCK_SONGS);
+        return songs.filter(s => s.language?.toLowerCase() === lang.toLowerCase());
     },
 
     getSongsByGenre: async (genre) => {
-        await new Promise(resolve => setTimeout(resolve, 300));
-        return MOCK_SONGS.filter(s => s.genre?.toLowerCase().includes(genre.toLowerCase()));
+        const songs = await fetchFromWorker('/api/songs', MOCK_SONGS);
+        return songs.filter(s => s.genre?.toLowerCase().includes(genre.toLowerCase()));
     },
 
     getArtistMeta: async (artistName) => {
-        await new Promise(resolve => setTimeout(resolve, 200));
-        const firstSong = MOCK_SONGS.find(s => s.artist.toLowerCase().includes(artistName.toLowerCase()));
+        const songs = await fetchFromWorker('/api/songs', MOCK_SONGS);
+        const firstSong = songs.find(s => s.artist.toLowerCase().includes(artistName.toLowerCase()));
         return {
             name: artistName,
             image: firstSong?.image || '',

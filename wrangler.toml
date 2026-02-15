@@ -1,0 +1,13 @@
+name = "lyriverse-api"
+main = "scripts/worker-index.js"
+compatibility_date = "2024-03-01"
+
+[triggers]
+crons = ["0 */6 * * *"] # Every 6 hours
+
+[[kv_namespaces]]
+binding = "LYRI_DATA"
+id = "f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0" # Placeholder ID, usually set during deployment
+
+[env.production]
+# Add production vars here
