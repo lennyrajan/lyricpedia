@@ -90,9 +90,9 @@ async function runDiscovery(env) {
         }
 
         // 2. UNIVERSAL SEED LIBRARY (Classic & Regional Legends)
-        // This ensures the one-stop shop has all the essentials across all major regions.
+        // A massive core for the "One-Stop Shop" vision.
         const universalSeed = [
-            // Indian Core (Tamil, Telugu, Malayalam, Hindi)
+            // Indian Core (Tamil, Telugu, Malayalam, Hindi, Kannada, Punjabi)
             { title: "Kaavalaa", artist: "Anirudh Ravichander", lang: "Tamil", genre: "Kollywood" },
             { title: "Hukum", artist: "Anirudh Ravichander", lang: "Tamil", genre: "Kollywood" },
             { title: "Enna Solla", artist: "Anirudh Ravichander", lang: "Tamil", genre: "Kollywood" },
@@ -101,21 +101,28 @@ async function runDiscovery(env) {
             { title: "Pala Palli", artist: "Atul Narukara", lang: "Malayalam", genre: "Folk" },
             { title: "Kalaavathi", artist: "Thaman S", lang: "Telugu", genre: "Tollywood" },
             { title: "Buttabomma", artist: "Thaman S", lang: "Telugu", genre: "Tollywood" },
+            { title: "Ra Ra Rakkamma", artist: "Nakash Aziz", lang: "Kannada", genre: "Sandalwood" },
             { title: "Kesariya", artist: "Arijit Singh", lang: "Hindi", genre: "Bollywood" },
             { title: "Tum Hi Ho", artist: "Arijit Singh", lang: "Hindi", genre: "Bollywood" },
             { title: "Pasoori", artist: "Ali Sethi", lang: "Punjabi", genre: "Global" },
 
-            // European & Global (Spanish, German, Polish)
+            // East Asia (Korean, Japanese)
+            { title: "Seven", artist: "Jung Kook", lang: "Korean", genre: "K-Pop" },
+            { title: "Ditto", artist: "NewJeans", lang: "Korean", genre: "K-Pop" },
+            { title: "Idol", artist: "YOASOBI", lang: "Japanese", genre: "J-Pop" },
+
+            // European & Middle East (Spanish, German, Polish, French, Arabic)
             { title: "Despacito", artist: "Luis Fonsi", lang: "Spanish", genre: "Latin" },
             { title: "BZRP Sessions #53", artist: "Shakira", lang: "Spanish", genre: "Latin" },
+            { title: "Dernière danse", artist: "Indila", lang: "French", genre: "Pop" },
             { title: "Sie weiß", artist: "Ayliva", lang: "German", genre: "Pop" },
             { title: "Sommer am Kiez", artist: "Ski Aggu", lang: "German", genre: "Rap" },
             { title: "Tamagotchi", artist: "Mata", lang: "Polish", genre: "Rap" },
-            { title: "Kiss Me More", artist: "Doja Cat", lang: "English", genre: "Pop" },
+            { title: "3 Daqat", artist: "Abu", lang: "Arabic", genre: "Pop" },
+
+            // Global Legends
             { title: "Starboy", artist: "The Weeknd", lang: "English", genre: "Pop" },
             { title: "Blinding Lights", artist: "The Weeknd", lang: "English", genre: "Pop" },
-
-            // Classical & Standard
             { title: "Bohemian Rhapsody", artist: "Queen", lang: "English", genre: "Rock" },
             { title: "Imagine", artist: "John Lennon", lang: "English", genre: "Classic" }
         ];
