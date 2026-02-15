@@ -67,26 +67,40 @@ export default {
 
 async function runDiscovery(env) {
     const startTime = Date.now();
+    let diagnostic = {
+        base_charts: "Pending",
+        seed_count: 0,
+        kv_write: "Pending"
+    };
+
     console.log("🚀 UNIVERSAL INDEXER ACTIVE: Syncing Global Music Graph...");
 
     try {
         // 1. Live Trend Multiplex (UK & Global Base)
         const trendingSongs = [];
         try {
-            const res = await fetch('https://www.officialcharts.com/charts/singles-chart/');
+            const res = await fetch('https://www.officialcharts.com/charts/singles-chart/', {
+                headers: { 'User-Agent': 'Lyriverse-Discovery-Bot/1.0' }
+            });
             const html = await res.text();
-            const entryRegex = /<div class="chart-name">[\s\S]*?<span>(.*?)<\/span>[\s\S]*?<div class="chart-artist">[\s\S]*?<span>(.*?)<\/span>/g;
-            let match;
-            while ((match = entryRegex.exec(html)) !== null && trendingSongs.length < 30) {
-                trendingSongs.push({
-                    title: match[1].trim(),
-                    artist: match[2].trim(),
-                    lang: "English",
-                    genre: "Pop/Charts"
-                });
+
+            if (html.includes("Access Denied") || html.length < 1000) {
+                diagnostic.base_charts = "Blocked/Empty (Site Protection)";
+            } else {
+                const entryRegex = /<div class="chart-name">[\s\S]*?<span>(.*?)<\/span>[\s\S]*?<div class="chart-artist">[\s\S]*?<span>(.*?)<\/span>/g;
+                let match;
+                while ((match = entryRegex.exec(html)) !== null && trendingSongs.length < 30) {
+                    trendingSongs.push({
+                        title: match[1].trim(),
+                        artist: match[2].trim(),
+                        lang: "English",
+                        genre: "Pop/Charts"
+                    });
+                }
+                diagnostic.base_charts = trendingSongs.length > 0 ? `Found ${trendingSongs.length} tracks` : "Regex Mismatch";
             }
         } catch (e) {
-            console.error("Trend scrape failed, using seed only.");
+            diagnostic.base_charts = `Network Error: ${e.message}`;
         }
 
         // 2. UNIVERSAL SEED LIBRARY (Classic & Regional Legends)
@@ -95,37 +109,14 @@ async function runDiscovery(env) {
             // Indian Core (Tamil, Telugu, Malayalam, Hindi, Kannada, Punjabi)
             { title: "Kaavalaa", artist: "Anirudh Ravichander", lang: "Tamil", genre: "Kollywood" },
             { title: "Hukum", artist: "Anirudh Ravichander", lang: "Tamil", genre: "Kollywood" },
-            { title: "Enna Solla", artist: "Anirudh Ravichander", lang: "Tamil", genre: "Kollywood" },
-            { title: "Naa Ready", artist: "Anirudh Ravichander", lang: "Tamil", genre: "Kollywood" },
-            { title: "Malabari Banger", artist: "M.H.R", lang: "Malayalam", genre: "Regional" },
-            { title: "Pala Palli", artist: "Atul Narukara", lang: "Malayalam", genre: "Folk" },
-            { title: "Kalaavathi", artist: "Thaman S", lang: "Telugu", genre: "Tollywood" },
-            { title: "Buttabomma", artist: "Thaman S", lang: "Telugu", genre: "Tollywood" },
             { title: "Ra Ra Rakkamma", artist: "Nakash Aziz", lang: "Kannada", genre: "Sandalwood" },
+            { title: "Malabari Banger", artist: "M.H.R", lang: "Malayalam", genre: "Regional" },
             { title: "Kesariya", artist: "Arijit Singh", lang: "Hindi", genre: "Bollywood" },
-            { title: "Tum Hi Ho", artist: "Arijit Singh", lang: "Hindi", genre: "Bollywood" },
-            { title: "Pasoori", artist: "Ali Sethi", lang: "Punjabi", genre: "Global" },
-
-            // East Asia (Korean, Japanese)
-            { title: "Seven", artist: "Jung Kook", lang: "Korean", genre: "K-Pop" },
             { title: "Ditto", artist: "NewJeans", lang: "Korean", genre: "K-Pop" },
-            { title: "Idol", artist: "YOASOBI", lang: "Japanese", genre: "J-Pop" },
-
-            // European & Middle East (Spanish, German, Polish, French, Arabic)
             { title: "Despacito", artist: "Luis Fonsi", lang: "Spanish", genre: "Latin" },
-            { title: "BZRP Sessions #53", artist: "Shakira", lang: "Spanish", genre: "Latin" },
-            { title: "Dernière danse", artist: "Indila", lang: "French", genre: "Pop" },
-            { title: "Sie weiß", artist: "Ayliva", lang: "German", genre: "Pop" },
-            { title: "Sommer am Kiez", artist: "Ski Aggu", lang: "German", genre: "Rap" },
-            { title: "Tamagotchi", artist: "Mata", lang: "Polish", genre: "Rap" },
-            { title: "3 Daqat", artist: "Abu", lang: "Arabic", genre: "Pop" },
-
-            // Global Legends
-            { title: "Starboy", artist: "The Weeknd", lang: "English", genre: "Pop" },
-            { title: "Blinding Lights", artist: "The Weeknd", lang: "English", genre: "Pop" },
-            { title: "Bohemian Rhapsody", artist: "Queen", lang: "English", genre: "Rock" },
             { title: "Imagine", artist: "John Lennon", lang: "English", genre: "Classic" }
         ];
+        diagnostic.seed_count = universalSeed.length;
 
         // Merge and Deduplicate
         const mergedLibrary = [...trendingSongs, ...universalSeed];
@@ -138,15 +129,9 @@ async function runDiscovery(env) {
 
             const snippets = [
                 "Walking through the city with the lights down low...",
-                "The echo of your name still rings in the hall.",
-                "Diamond heart but a soul made of porcelain.",
-                "We were giants once, before the tide rolled in.",
                 "Nee vandhu ninnaporthu... (Tamil Soul)",
-                "Kesariya tera ishq hai piya... (Hindi Classic)",
-                "Maname... (Malayalam Echo)",
-                "Quiero respirar tu cuello despacito... (Spanish Heat)",
                 "Ich will nur, dass du weißt... (German Pop)",
-                "Fast cars and slow nights in the valley."
+                "Fast cars and slow nights..."
             ];
 
             return {
@@ -164,19 +149,26 @@ async function runDiscovery(env) {
         });
 
         // 4. Update the Cloud Knowledge Graph
-        await env.LYRI_DATA.put("music-graph", JSON.stringify(enrichedSongs));
+        try {
+            await env.LYRI_DATA.put("music-graph", JSON.stringify(enrichedSongs));
+            diagnostic.kv_write = "Success";
+        } catch (e) {
+            diagnostic.kv_write = `Failed: ${e.message} (Is KV Bound?)`;
+        }
 
         const stats = {
-            scanned: trendingSongs.length,
-            universal_seed: universalSeed.length,
-            total_indexed: enrichedSongs.length,
+            scanned_web: trendingSongs.length,
+            seeded_internal: universalSeed.length,
+            total_active_index: enrichedSongs.length,
+            diag_base_scrape: diagnostic.base_charts,
+            diag_kv_status: diagnostic.kv_write,
             languages: [...new Set(enrichedSongs.map(s => s.language))].join(", "),
-            timestamp: new Date().toISOString()
+            last_sync: new Date().toISOString()
         };
         await env.LYRI_DATA.put("admin-report", JSON.stringify(stats));
 
-        console.log("🌍 UNIVERSAL GRAPH UPDATED. One-Stop Shop Active.");
+        console.log("🌍 UNIVERSAL GRAPH UPDATED.");
     } catch (err) {
-        console.error("Discovery Error:", err.message);
+        console.error("Critical Discovery Error:", err.message);
     }
 }

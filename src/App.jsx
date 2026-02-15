@@ -160,19 +160,25 @@ const App = () => {
                   <h4>Cloud Discovery Report</h4>
                   <div className="stats-grid">
                     <div className="stat-item">
-                      <span className="s-label">SCANNED</span>
-                      <span className="s-value">{adminReport.scanned}</span>
+                      <span className="s-label">WEBSITE TRACKS</span>
+                      <span className="s-value">{adminReport.scanned_web || 0}</span>
                     </div>
                     <div className="stat-item">
-                      <span className="s-label">ENRICHED</span>
-                      <span className="s-value">{adminReport.enriched}</span>
+                      <span className="s-label">INTERNAL SEEDS</span>
+                      <span className="s-value">{adminReport.seeded_internal || 0}</span>
                     </div>
                     <div className="stat-item">
-                      <span className="s-label">DURATION</span>
-                      <span className="s-value">{Math.round(adminReport.durationSeconds)}s</span>
+                      <span className="s-label">TOTAL INDEXED</span>
+                      <span className="s-value">{adminReport.total_active_index || 0}</span>
                     </div>
                   </div>
-                  <p className="report-meta">Last cloud run: {new Date(adminReport.endTime).toLocaleString()}</p>
+
+                  <div className="diagnostic-box">
+                    <div className="diag-line"><b>Scraper:</b> {adminReport.diag_base_scrape || 'Outdated Worker Detected'}</div>
+                    <div className="diag-line"><b>Storage (KV):</b> {adminReport.diag_kv_status || 'Outdated Worker Detected'}</div>
+                  </div>
+
+                  <p className="report-meta">Last sync: {adminReport.last_sync ? new Date(adminReport.last_sync).toLocaleString() : 'Old Version'}</p>
                 </div>
               )}
             </div>
@@ -620,6 +626,21 @@ const App = () => {
           from { opacity: 0; }
           to { opacity: 1; }
         }
+
+        .diagnostic-box {
+          background: rgba(0,0,0,0.3);
+          border-radius: 8px;
+          padding: var(--space-sm);
+          margin-top: var(--space-md);
+          border: 1px solid var(--glass-border);
+        }
+        .diag-line {
+          font-size: 0.75rem;
+          color: var(--text-muted);
+          margin-bottom: 4px;
+          font-family: monospace;
+        }
+        .diag-line b { color: var(--primary); }
       `}</style>
     </div>
   );
