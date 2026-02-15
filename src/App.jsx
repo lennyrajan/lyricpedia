@@ -40,6 +40,30 @@ const App = () => {
     }
     window.scrollTo(0, 0);
   };
+  const goBack = () => {
+    if (history.length > 1) {
+      const newHistory = [...history];
+      newHistory.pop();
+      const prevPage = newHistory[newHistory.length - 1];
+      setHistory(newHistory);
+      setCurrentPage(prevPage);
+    } else {
+      navigateTo('home');
+    }
+  };
+
+  const handleSearch = async (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    if (query.length > 2) {
+      setIsSearching(true);
+      const results = await songService.searchSongs(query);
+      setSearchResults(results);
+      setIsSearching(false);
+    } else {
+      setSearchResults([]);
+    }
+  };
 
   const handleLogin = (e) => {
     e.preventDefault();
