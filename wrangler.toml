@@ -9,5 +9,4 @@ crons = ["0 */6 * * *"] # Every 6 hours
 binding = "LYRI_DATA"
 id = "842b3198708345ac830baacd839b0a09" # Placeholder ID, usually set during deployment
 
-[env.production]
-# Add production vars here
+# No production sub-env needed for this simple setup

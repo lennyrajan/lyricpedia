@@ -11,7 +11,7 @@ export default {
         ctx.waitUntil(runDiscovery(env));
     },
 
-    async fetch(request, env) {
+    async fetch(request, env, ctx) {
         const url = new URL(request.url);
 
         // CORS Headers
