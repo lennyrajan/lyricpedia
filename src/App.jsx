@@ -226,15 +226,18 @@ const App = () => {
       default:
         return (
           <div className="discovery-view">
-            <div className="search-container glass-panel">
-              <input
-                type="text"
-                placeholder="Search lyrics, artists, languages..."
-                className="search-input"
-                value={searchQuery}
-                onChange={handleSearch}
-              />
-              {isSearching && <div className="search-spinner"></div>}
+            <div className={`search-container-modern ${searchQuery ? 'active' : ''}`}>
+              <div className="search-glass">
+                <span className="search-icon-svg">🔍</span>
+                <input
+                  type="text"
+                  placeholder="Search lyrics, artists, languages..."
+                  className="search-input-premium"
+                  value={searchQuery}
+                  onChange={handleSearch}
+                />
+                {isSearching && <div className="search-spinner-modern"></div>}
+              </div>
             </div>
 
             {searchQuery.length > 2 ? (
@@ -286,7 +289,10 @@ const App = () => {
                     ))}
                   </div>
                 </div>
-                <Home onSongSelect={(song) => navigateTo('detail', song)} />
+                <Home
+                  onSongSelect={(song) => navigateTo('detail', song)}
+                  onLanguageSelect={(lang) => navigateTo('hub', { type: 'language', value: lang })}
+                />
               </>
             )}
           </div>
@@ -317,7 +323,10 @@ const App = () => {
             <span className="nav-icon">🏠</span>
             <span className="nav-label">Home</span>
           </button>
-          <button className="nav-btn">
+          <button
+            className={`nav-btn ${currentPage === 'hub' && selectedHub?.value === 'Pop' ? 'active' : ''}`}
+            onClick={() => navigateTo('hub', { type: 'genre', value: 'Pop' })}
+          >
             <span className="nav-icon">🔥</span>
             <span className="nav-label">Hot</span>
           </button>
@@ -625,6 +634,56 @@ const App = () => {
         @keyframes fadeIn {
           from { opacity: 0; }
           to { opacity: 1; }
+        }
+
+        .search-container-modern {
+          margin-bottom: var(--space-xl);
+          transition: transform 0.3s ease;
+        }
+        .search-container-modern.active {
+          transform: translateY(-5px);
+        }
+        .search-glass {
+          display: flex;
+          align-items: center;
+          gap: var(--space-md);
+          background: rgba(255, 255, 255, 0.05);
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 20px;
+          padding: 12px 24px;
+          box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .search-glass:focus-within {
+          background: rgba(255, 255, 255, 0.08);
+          border-color: var(--primary);
+          box-shadow: 0 8px 32px 0 rgba(var(--primary-rgb), 0.2);
+          transform: scale(1.01);
+        }
+        .search-icon-svg {
+          font-size: 1.2rem;
+          opacity: 0.6;
+        }
+        .search-input-premium {
+          flex: 1;
+          background: transparent;
+          border: none;
+          color: white;
+          font-size: 1.1rem;
+          font-weight: 500;
+          outline: none;
+        }
+        .search-input-premium::placeholder {
+          color: rgba(255, 255, 255, 0.4);
+        }
+        .search-spinner-modern {
+          width: 20px;
+          height: 20px;
+          border: 2px solid rgba(255,255,255,0.1);
+          border-top-color: var(--primary);
+          border-radius: 50%;
+          animation: spin 0.8s linear infinite;
         }
 
         .diagnostic-box {

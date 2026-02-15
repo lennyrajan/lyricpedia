@@ -126,12 +126,17 @@ async function runDiscovery(env) {
         // 3. Pro Enrichment: Real-time Lyric Extraction Simulation
         const enrichedSongs = uniqueSongs.map((s, i) => {
             const hash = s.title.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0);
-
             const snippets = [
                 "Walking through the city with the lights down low...",
+                "The echo of your name still rings in the hall.",
+                "Diamond heart but a soul made of porcelain.",
+                "We were giants once, before the tide rolled in.",
                 "Nee vandhu ninnaporthu... (Tamil Soul)",
+                "Kesariya tera ishq hai piya... (Hindi Classic)",
+                "Maname... (Malayalam Echo)",
                 "Ich will nur, dass du weißt... (German Pop)",
-                "Fast cars and slow nights..."
+                "Quiero respirar tu cuello despacito... (Spanish Classic)",
+                "Fast cars and slow nights in the valley."
             ];
 
             return {

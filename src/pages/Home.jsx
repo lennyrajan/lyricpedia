@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { songService } from '../services/songService';
 
-const Home = ({ onSongSelect }) => {
+const Home = ({ onSongSelect, onLanguageSelect }) => {
   const [trending, setTrending] = useState([]);
   const [newReleases, setNewReleases] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -9,6 +9,8 @@ const Home = ({ onSongSelect }) => {
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const observer = useRef();
+
+  const topLanguages = ['Tamil', 'Malayalam', 'Hindi', 'Spanish', 'Korean', 'English'];
 
   const lastSongElementRef = useCallback(node => {
     if (loading || loadingMore) return;
@@ -60,7 +62,28 @@ const Home = ({ onSongSelect }) => {
   );
 
   return (
-    <div className="home-page">
+    <div className="home-container">
+      <section className="language-explorer">
+        <div className="section-header">
+          <h2 className="title-premium">Regional Explorer</h2>
+          <span className="subtitle">Instant access to local treasures</span>
+        </div>
+        <div className="lang-grid-modern">
+          {topLanguages.map(lang => (
+            <div
+              key={lang}
+              className="lang-item-circle"
+              onClick={() => onLanguageSelect?.(lang)}
+            >
+              <div className="circle-gradient">
+                <span className="lang-initial">{lang[0]}</span>
+              </div>
+              <span className="lang-name-mini">{lang}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <section className="trending-section">
         <div className="section-header">
           <h2 className="title-premium">Top Trends</h2>
@@ -142,9 +165,58 @@ const Home = ({ onSongSelect }) => {
       </section>
 
       <style jsx>{`
-        .home-page {
+        .home-container {
           padding-top: var(--space-md);
           animation: fadeIn 0.4s ease;
+        }
+
+        .lang-grid-modern {
+          display: flex;
+          gap: var(--space-md);
+          overflow-x: auto;
+          padding: var(--space-sm) 0 var(--space-lg) 0;
+          scrollbar-width: none;
+        }
+
+        .lang-grid-modern::-webkit-scrollbar { display: none; }
+
+        .lang-item-circle {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 8px;
+          cursor: pointer;
+          min-width: 70px;
+          transition: transform 0.2s ease;
+        }
+
+        .lang-item-circle:hover { transform: translateY(-5px); }
+
+        .circle-gradient {
+          width: 56px;
+          height: 56px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, var(--primary) 0%, #7e22ce 100%);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 4px 15px rgba(var(--primary-rgb), 0.3);
+          border: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .lang-initial {
+          font-size: 1.5rem;
+          font-weight: 800;
+          color: white;
+          text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .lang-name-mini {
+          font-size: 0.7rem;
+          font-weight: 700;
+          color: var(--text-muted);
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
         }
 
         @keyframes fadeIn {
