@@ -7,7 +7,7 @@ import MOCK_SONGS from '../data/music-graph.json';
 
 // In production, this would be your worker URL
 // PASTE YOUR WORKER URL HERE (the same one you put in App.jsx)
-const WORKER_URL = 'https://lyriverse-brain.YOUR_USERNAME.workers.dev';
+const WORKER_URL = 'https://lyriverse-brain.lennyrajan.workers.dev';
 
 async function fetchFromWorker(path, fallback) {
     try {
