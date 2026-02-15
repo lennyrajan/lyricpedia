@@ -12,8 +12,6 @@ export default {
     },
 
     async fetch(request, env, ctx) {
-        const url = new URL(request.url);
-
         // CORS Headers
         const corsHeaders = {
             "Access-Control-Allow-Origin": "*",
@@ -21,40 +19,49 @@ export default {
             "Access-Control-Allow-Headers": "Content-Type",
         };
 
-        if (request.method === "OPTIONS") {
-            return new Response(null, { headers: corsHeaders });
-        }
+        try {
+            const url = new URL(request.url);
 
-        // GET: Fetch current index
-        if (url.pathname === "/api/songs" && request.method === "GET") {
-            const data = await env.LYRI_DATA.get("music-graph", "json");
-            return new Response(JSON.stringify(data || []), {
+            if (request.method === "OPTIONS") {
+                return new Response(null, { headers: corsHeaders });
+            }
+
+            // GET: Fetch current index
+            if (url.pathname === "/api/songs" && request.method === "GET") {
+                const data = await env.LYRI_DATA.get("music-graph", "json");
+                return new Response(JSON.stringify(data || []), {
+                    headers: { ...corsHeaders, "Content-Type": "application/json" }
+                });
+            }
+
+            // GET: Fetch admin report
+            if (url.pathname === "/api/report" && request.method === "GET") {
+                const report = await env.LYRI_DATA.get("admin-report", "json");
+                return new Response(JSON.stringify(report || {}), {
+                    headers: { ...corsHeaders, "Content-Type": "application/json" }
+                });
+            }
+
+            // POST: Manual Trigger (Admin Only)
+            if (url.pathname === "/api/index" && request.method === "POST") {
+                // In a real app, verify admin auth here
+                ctx.waitUntil(runDiscovery(env));
+                return new Response(JSON.stringify({ message: "Discovery process initiated in background." }), {
+                    headers: { ...corsHeaders, "Content-Type": "application/json" }
+                });
+            }
+
+            // Final Fallback: Always return with CORS
+            return new Response(JSON.stringify({ error: "Endpoint not found" }), {
+                status: 404,
+                headers: { ...corsHeaders, "Content-Type": "application/json" }
+            });
+        } catch (err) {
+            return new Response(JSON.stringify({ error: err.message }), {
+                status: 500,
                 headers: { ...corsHeaders, "Content-Type": "application/json" }
             });
         }
-
-        // GET: Fetch admin report
-        if (url.pathname === "/api/report" && request.method === "GET") {
-            const report = await env.LYRI_DATA.get("admin-report", "json");
-            return new Response(JSON.stringify(report || {}), {
-                headers: { ...corsHeaders, "Content-Type": "application/json" }
-            });
-        }
-
-        // POST: Manual Trigger (Admin Only)
-        if (url.pathname === "/api/index" && request.method === "POST") {
-            // In a real app, verify admin auth here
-            ctx.waitUntil(runDiscovery(env));
-            return new Response(JSON.stringify({ message: "Discovery process initiated in background." }), {
-                headers: { ...corsHeaders, "Content-Type": "application/json" }
-            });
-        }
-
-        // Final Fallback: Always return with CORS
-        return new Response(JSON.stringify({ error: "Endpoint not found" }), {
-            status: 404,
-            headers: { ...corsHeaders, "Content-Type": "application/json" }
-        });
     }
 };
 
