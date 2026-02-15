@@ -37,15 +37,15 @@
   },
   {
     "id": "song-4",
-    "title": "DTMF",
-    "artist": "BAD BUNNY",
-    "album": "Current Hits",
+    "title": "Despacito",
+    "artist": "Luis Fonsi",
+    "album": "Spanish Essentials",
     "year": 2026,
     "language": "Spanish",
     "genre": "Latin",
     "popularity": 97,
     "snippet": "Quiero respirar tu cuello despacito... (Spanish Classic)",
-    "image": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/90/5e/7e/905e7ed5-a8fa-a8f3-cd06-0028fdf3afaa/199066342442.jpg/600x600bb.jpg"
+    "image": "https://picsum.photos/seed/despacito/600/600"
   },
   {
     "id": "song-5",
@@ -123,7 +123,7 @@
     "id": "song-11",
     "title": "Kaavalaa",
     "artist": "Anirudh Ravichander",
-    "album": "South Hits",
+    "album": "Tamil Essentials",
     "year": 2026,
     "language": "Tamil",
     "genre": "Kollywood",
@@ -135,7 +135,7 @@
     "id": "song-12",
     "title": "Kesariya",
     "artist": "Arijit Singh",
-    "album": "Bollywood Hits",
+    "album": "Hindi Essentials",
     "year": 2026,
     "language": "Hindi",
     "genre": "Bollywood",
@@ -147,12 +147,36 @@
     "id": "song-13",
     "title": "Malabari Banger",
     "artist": "M.H.R",
-    "album": "Regional Hits",
+    "album": "Malayalam Essentials",
     "year": 2026,
     "language": "Malayalam",
     "genre": "Regional",
     "popularity": 98,
     "snippet": "Maname... (Malayalam Echo)",
     "image": "https://picsum.photos/seed/malabari/600/600"
+  },
+  {
+    "id": "song-14",
+    "title": "Ditto",
+    "artist": "NewJeans",
+    "album": "Korean Essentials",
+    "year": 2026,
+    "language": "Korean",
+    "genre": "K-Pop",
+    "popularity": 97,
+    "snippet": "Ditto, I want you to say it back...",
+    "image": "https://picsum.photos/seed/ditto/600/600"
+  },
+  {
+    "id": "song-15",
+    "title": "Imagine",
+    "artist": "John Lennon",
+    "album": "English Essentials",
+    "year": 2026,
+    "language": "English",
+    "genre": "Classic",
+    "popularity": 96,
+    "snippet": "Imagine all the people living life in peace...",
+    "image": "https://picsum.photos/seed/imagine/600/600"
   }
 ]

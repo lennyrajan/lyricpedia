@@ -123,23 +123,40 @@ async function runDiscovery(env) {
         const uniqueSongs = Array.from(new Set(mergedLibrary.map(s => `${s.title}|${s.artist}`)))
             .map(id => mergedLibrary.find(s => `${s.title}|${s.artist}` === id));
 
-        // 3. Pro Enrichment: Real-time Lyric Extraction Simulation
-        const enrichedSongs = uniqueSongs.map((s, i) => {
-            const hash = s.title.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0);
-            const snippets = [
-                "Walking through the city with the lights down low...",
-                "The echo of your name still rings in the hall.",
-                "Diamond heart but a soul made of porcelain.",
-                "We were giants once, before the tide rolled in.",
-                "Nee vandhu ninnaporthu... (Tamil Soul)",
-                "Kesariya tera ishq hai piya... (Hindi Classic)",
-                "Maname... (Malayalam Echo)",
-                "Ich will nur, dass du weißt... (German Pop)",
-                "Quiero respirar tu cuello despacito... (Spanish Classic)",
-                "Fast cars and slow nights in the valley."
-            ];
+        // 3. Pro Enrichment: Real-time Lyric Extraction via LRCLIB
+        const enrichedSongs = [];
+        console.log(`🔍 [Lyriverse] Starting Dynamic Enrichment for ${uniqueSongs.length} tracks...`);
 
-            return {
+        for (let i = 0; i < uniqueSongs.length; i++) {
+            const s = uniqueSongs[i];
+            let snippet = "Musical vibes resonating through the soul... (Auto-Indexed)";
+
+            try {
+                // Fetch from LRCLIB (Free, No Key)
+                const lrclibUrl = `https://lrclib.net/api/get?artist_name=${encodeURIComponent(s.artist)}&track_name=${encodeURIComponent(s.title)}`;
+                const response = await fetch(lrclibUrl, {
+                    headers: { 'User-Agent': 'Lyriverse-Discovery-Bot/1.0 (https://lyriverse.org)' }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.plainLyrics) {
+                        // Extract first 2-3 meaningful lines
+                        const lines = data.plainLyrics.split('\n')
+                            .map(l => l.trim())
+                            .filter(l => l.length > 5 && !l.startsWith('[') && !l.endsWith(']'))
+                            .slice(0, 2);
+
+                        if (lines.length > 0) {
+                            snippet = lines.join(' ') + '...';
+                        }
+                    }
+                }
+            } catch (err) {
+                console.warn(`⚠️ Failed to fetch lyrics for: ${s.title} - ${err.message}`);
+            }
+
+            enrichedSongs.push({
                 id: `uni-${Date.now()}-${i}`,
                 title: s.title,
                 artist: s.artist,
@@ -148,10 +165,15 @@ async function runDiscovery(env) {
                 language: s.lang,
                 genre: s.genre,
                 popularity: 100 - (i % 50),
-                snippet: snippets[Math.abs(hash) % snippets.length],
+                snippet: snippet,
                 image: `https://picsum.photos/seed/${encodeURIComponent(s.title + s.artist)}/600/600`
-            };
-        });
+            });
+
+            // Minor stagger to avoid burst rate-limiting (approx 100ms between tracks)
+            if (i < uniqueSongs.length - 1) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+        }
 
         // 4. Update the Cloud Knowledge Graph
         try {

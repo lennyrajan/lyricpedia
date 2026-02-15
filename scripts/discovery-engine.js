@@ -64,22 +64,27 @@ async function runDiscovery() {
         stats.scanned = trendingSongs.length;
         console.log(`✅ Identified ${trendingSongs.length} trending tracks.`);
 
-        // 2. Enrich with Lyrics Snippets
+        // 2. Enrich with Lyrics Snippets via LRCLIB
         const enrichedSongs = [];
         for (const song of trendingSongs) {
             process.stdout.write(`🔍 [${enrichedSongs.length + 1}/${trendingSongs.length}] Indexing: ${song.title}... `);
             try {
-                const snippetSearch = await axios.get(`https://www.google.com/search?q=${encodeURIComponent(song.title + ' ' + song.artist + ' lyrics')}`, {
-                    headers: { 'User-Agent': 'Mozilla/5.0' },
+                const lrclibUrl = `https://lrclib.net/api/get?artist_name=${encodeURIComponent(song.artist)}&track_name=${encodeURIComponent(song.title)}`;
+                const lyricsRes = await axios.get(lrclibUrl, {
+                    headers: { 'User-Agent': 'Lyriverse-Discovery-Engine/1.0' },
                     timeout: 5000
                 });
-                const $snippet = cheerio.load(snippetSearch.data);
 
-                let snippet = $snippet('div.VwiC3b').first().text().trim();
-                if (!snippet || snippet.length < 10) {
-                    snippet = `Looking for lyrics for ${song.title}... Thematic extraction in progress.`;
-                } else {
-                    snippet = snippet.split('.')[0] + (snippet.split('.')[1] ? '.' + snippet.split('.')[1] + '.' : '.');
+                let snippet = "Musical vibes resonating through the soul... (Auto-Indexed)";
+                if (lyricsRes.data && lyricsRes.data.plainLyrics) {
+                    const lines = lyricsRes.data.plainLyrics.split('\n')
+                        .map(l => l.trim())
+                        .filter(l => l.length > 5 && !l.startsWith('[') && !l.endsWith(']'))
+                        .slice(0, 2);
+
+                    if (lines.length > 0) {
+                        snippet = lines.join(' ') + '...';
+                    }
                 }
 
                 let highResImage = song.image;
@@ -95,7 +100,7 @@ async function runDiscovery() {
                     artist: song.artist,
                     album: "Current Hits",
                     year: 2026,
-                    language: 'English',
+                    language: 'English', // Initial assumption for trending charts
                     genre: 'Pop',
                     popularity: 100 - enrichedSongs.length,
                     snippet: snippet,
@@ -104,14 +109,18 @@ async function runDiscovery() {
 
                 stats.enriched++;
                 console.log('OK');
-                await new Promise(r => setTimeout(r, 300));
+                await new Promise(r => setTimeout(r, 200)); // Stagger
             } catch (e) {
-                console.log('FAIL');
+                console.log('FAIL (No Lyrics Found)');
                 stats.failed++;
                 enrichedSongs.push({
                     ...song,
                     id: `song-${Date.now()}-${enrichedSongs.length}`,
-                    snippet: "Lyrics discovered. Snippet indexing delayed."
+                    album: "Current Hits",
+                    language: "English",
+                    genre: "Pop",
+                    snippet: "Lyrics discovered. Snippet indexing delayed.",
+                    image: song.image
                 });
             }
         }
