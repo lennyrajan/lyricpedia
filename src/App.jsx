@@ -67,13 +67,13 @@ const App = () => {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    if (loginForm.username === 'mastermad') {
+    if (loginForm.username === 'mastermad' && loginForm.password === 'GuppyFishes@2026') {
       setUser({ username: 'mastermad' });
       setShowLogin(false);
       setLoginForm({ username: '', password: '' });
       alert('Welcome, ADMIN.');
     } else {
-      alert('Unauthorized access.');
+      alert('Unauthorized access. Invalid credentials.');
     }
   };
 
