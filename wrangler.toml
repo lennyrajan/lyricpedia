@@ -7,7 +7,7 @@ crons = ["0 */6 * * *"] # Every 6 hours
 
 [[kv_namespaces]]
 binding = "LYRI_DATA"
-id = "f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0" # Placeholder ID, usually set during deployment
+id = "842b3198708345ac830baacd839b0a09" # Placeholder ID, usually set during deployment
 
 [env.production]
 # Add production vars here
