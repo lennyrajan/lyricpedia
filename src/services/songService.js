@@ -41,7 +41,9 @@ export const songService = {
         const q = query.toLowerCase();
         return songs.filter(s =>
             s.title.toLowerCase().includes(q) ||
-            s.artist.toLowerCase().includes(q)
+            s.artist.toLowerCase().includes(q) ||
+            s.language?.toLowerCase().includes(q) ||
+            s.genre?.toLowerCase().includes(q)
         );
     },
 
