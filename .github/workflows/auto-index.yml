@@ -1,0 +1,37 @@
+name: Lyriverse Auto-Discovery
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Once a day at midnight
+  workflow_dispatch: # Enable manual triggers
+
+jobs:
+  index:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Discovery Engine
+        run: npm run index
+        env:
+          NODE_ENV: production
+
+      - name: Commit and Push Changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "Lyriverse Discovery Bot"
+          git add src/data/music-graph.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: auto-update knowledge graph [skip ci]" && git push)
