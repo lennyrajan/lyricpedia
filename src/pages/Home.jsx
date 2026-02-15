@@ -74,6 +74,7 @@ const Home = ({ onSongSelect }) => {
                 <div className="card-overlay">
                   <span className="play-btn-circle">➤</span>
                 </div>
+                <div className="card-badge">{song.language}</div>
               </div>
               <div className="t-card-info">
                 <span className="t-song-name">{song.title}</span>
@@ -83,6 +84,29 @@ const Home = ({ onSongSelect }) => {
           ))}
         </div>
       </section>
+
+      {newReleases.some(s => s.language !== 'English') && (
+        <section className="regional-spotlight">
+          <div className="section-header">
+            <h2 className="title-premium">Global Spotlight</h2>
+            <span className="subtitle">Regional Essentials & Hits</span>
+          </div>
+          <div className="horizontal-scroll">
+            {newReleases.filter(s => s.language !== 'English').slice(0, 10).map(song => (
+              <div key={`regional-${song.id}`} className="trending-card-premium" onClick={() => onSongSelect(song)}>
+                <div className="card-img-container">
+                  <img src={song.image} alt={song.title} className="t-card-img" />
+                  <div className="card-badge regional">{song.language}</div>
+                </div>
+                <div className="t-card-info">
+                  <span className="t-song-name">{song.title}</span>
+                  <span className="t-artist-name">{song.artist}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="new-releases">
         <div className="section-header">
@@ -102,9 +126,9 @@ const Home = ({ onSongSelect }) => {
                 <img src={song.image} alt={song.title} className="row-thumb-modern" />
                 <div className="song-info">
                   <div className="row-title-premium">{song.title}</div>
-                  <div className="row-meta-premium">{song.artist}</div>
+                  <div className="row-meta-premium">{song.artist} • <span className="lang-text">{song.language}</span></div>
                 </div>
-                <div className="explore-tag">EXPLORE</div>
+                <div className="explore-tag">{song.genre || 'POP'}</div>
               </div>
             );
           })}
@@ -179,105 +203,50 @@ const Home = ({ onSongSelect }) => {
           transform: scale(1.1);
         }
 
-        .card-overlay {
+        .card-badge {
           position: absolute;
-          inset: 0;
-          background: rgba(0,0,0,0.3);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          opacity: 0;
-          transition: opacity 0.3s ease;
+          top: 10px;
+          right: 10px;
+          background: rgba(0,0,0,0.6);
+          backdrop-filter: blur(4px);
+          color: white;
+          font-size: 0.6rem;
+          font-weight: 800;
+          padding: 4px 8px;
+          border-radius: 6px;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          z-index: 2;
         }
 
-        .trending-card-premium:hover .card-overlay {
-          opacity: 1;
+        .card-badge.regional {
+          background: var(--primary);
         }
 
-        .play-btn-circle {
-          width: 40px;
-          height: 40px;
-          background: white;
-          color: black;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 1rem;
-          padding-left: 3px;
+        .regional-spotlight {
+          margin-bottom: var(--space-xl);
+          animation: slideIn 0.6s ease;
         }
 
-        .t-card-info {
-          padding: var(--space-sm) 0;
-          display: flex;
-          flex-direction: column;
+        @keyframes slideIn {
+          from { opacity: 0; transform: translateX(20px); }
+          to { opacity: 1; transform: translateX(0); }
         }
 
-        .t-song-name {
+        .lang-text {
+          color: var(--primary);
           font-weight: 700;
-          font-size: 0.95rem;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
-        .t-artist-name {
-          font-size: 0.75rem;
-          color: var(--text-muted);
-          font-weight: 500;
-        }
-
-        .modern-list {
-          display: flex;
-          flex-direction: column;
-          gap: var(--space-sm);
-        }
-
-        .song-row-premium {
-          display: flex;
-          align-items: center;
-          gap: var(--space-md);
-          padding: var(--space-sm) var(--space-md);
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-
-        .song-row-premium:hover {
-          background: rgba(255,255,255,0.03);
-          transform: scale(1.02);
-        }
-
-        .row-thumb-modern {
-          width: 54px;
-          height: 54px;
-          border-radius: 10px;
-          object-fit: cover;
-          box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-
-        .song-info {
-          flex: 1;
-        }
-
-        .row-title-premium {
-          font-weight: 700;
-          font-size: 1.05rem;
-        }
-
-        .row-meta-premium {
-          font-size: 0.8rem;
-          color: var(--text-muted);
-          font-weight: 500;
         }
 
         .explore-tag {
-          font-size: 0.65rem;
+          font-size: 0.6rem;
           font-weight: 800;
-          color: var(--primary);
-          border: 1px solid var(--primary-glow);
-          padding: 4px 10px;
-          border-radius: 6px;
-          background: var(--primary-glow);
+          color: var(--text-main);
+          border: 1px solid var(--glass-border);
+          padding: 3px 8px;
+          border-radius: 4px;
+          background: rgba(255,255,255,0.05);
+          text-transform: uppercase;
         }
 
         .loading-state, .loading-more {

@@ -108,6 +108,19 @@ const App = () => {
     }
   };
 
+  const [categories, setCategories] = useState({ languages: [], genres: [] });
+
+  React.useEffect(() => {
+    const loadCategories = async () => {
+      const [langs, genres] = await Promise.all([
+        songService.getUniqueLanguages(),
+        songService.getUniqueGenres()
+      ]);
+      setCategories({ languages: langs, genres: genres });
+    };
+    if (currentPage === 'home') loadCategories();
+  }, [currentPage]);
+
   const renderPage = () => {
     if (currentPage === 'settings') {
       return (
@@ -210,7 +223,7 @@ const App = () => {
             <div className="search-container glass-panel">
               <input
                 type="text"
-                placeholder="Search lyrics, artists..."
+                placeholder="Search lyrics, artists, languages..."
                 className="search-input"
                 value={searchQuery}
                 onChange={handleSearch}
@@ -227,7 +240,7 @@ const App = () => {
                       <img src={song.image} alt={song.title} className="row-thumb" />
                       <div className="song-info">
                         <div className="row-title">{song.title}</div>
-                        <div className="row-meta">{song.artist}</div>
+                        <div className="row-meta">{song.artist} • {song.language}</div>
                       </div>
                       <button className="view-song-btn">EXPLORE</button>
                     </div>
@@ -239,12 +252,33 @@ const App = () => {
               </div>
             ) : (
               <>
-                <div className="discovery-pills">
-                  <button className="pill-btn active" onClick={() => navigateTo('home')}>All</button>
-                  <button className="pill-btn" onClick={() => navigateTo('hub', { type: 'genre', value: 'Pop' })}>Trends</button>
-                  <button className="pill-btn" onClick={() => navigateTo('hub', { type: 'genre', value: 'R&B' })}>R&B</button>
-                  <button className="pill-btn" onClick={() => navigateTo('hub', { type: 'language', value: 'English' })}>English</button>
-                  <button className="pill-btn" onClick={() => navigateTo('hub', { type: 'genre', value: 'Global' })}>Global</button>
+                <div className="discovery-pills-wrapper">
+                  <div className="discovery-pills">
+                    <button
+                      className={`pill-btn ${!selectedHub ? 'active' : ''}`}
+                      onClick={() => navigateTo('home')}
+                    >All</button>
+
+                    {categories.languages.map(lang => (
+                      <button
+                        key={lang}
+                        className={`pill-btn ${selectedHub?.value === lang ? 'active' : ''}`}
+                        onClick={() => navigateTo('hub', { type: 'language', value: lang })}
+                      >
+                        {lang}
+                      </button>
+                    ))}
+
+                    {categories.genres.filter(g => !['Pop', 'Charts'].includes(g)).map(genre => (
+                      <button
+                        key={genre}
+                        className={`pill-btn ${selectedHub?.value === genre ? 'active' : ''}`}
+                        onClick={() => navigateTo('hub', { type: 'genre', value: genre })}
+                      >
+                        {genre}
+                      </button>
+                    ))}
+                  </div>
                 </div>
                 <Home onSongSelect={(song) => navigateTo('detail', song)} />
               </>

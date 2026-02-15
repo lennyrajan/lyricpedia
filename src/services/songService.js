@@ -12,7 +12,15 @@ const WORKER_URL = 'https://lyriverse-brain.lennyrajan.workers.dev';
 async function fetchFromWorker(path, fallback) {
     try {
         const res = await fetch(`${WORKER_URL}${path}`);
-        if (res.ok) return await res.json();
+        if (res.ok) {
+            const data = await res.json();
+            // Fallback to local seed if the worker returns an empty dataset
+            if (Array.isArray(data) && data.length === 0) {
+                console.info(`Worker returned empty data for ${path}, using local seed.`);
+                return fallback;
+            }
+            return data;
+        }
     } catch (e) {
         console.warn(`Worker API ${path} failed, using local fallback.`, e);
     }
@@ -20,6 +28,15 @@ async function fetchFromWorker(path, fallback) {
 }
 
 export const songService = {
+    getUniqueLanguages: async () => {
+        const songs = await fetchFromWorker('/api/songs', MOCK_SONGS);
+        return [...new Set(songs.map(s => s.language).filter(Boolean))];
+    },
+
+    getUniqueGenres: async () => {
+        const songs = await fetchFromWorker('/api/songs', MOCK_SONGS);
+        return [...new Set(songs.map(s => s.genre).filter(Boolean))];
+    },
     getTrending: async () => {
         const songs = await fetchFromWorker('/api/songs', MOCK_SONGS);
         return songs.slice(0, 5);
