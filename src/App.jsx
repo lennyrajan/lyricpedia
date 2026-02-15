@@ -8,7 +8,7 @@ import Hub from './pages/Hub';
 import { songService } from './services/songService';
 
 const App = () => {
-  const [user, setUser] = useState(null); // { username: 'mastermad' }
+  const [user, setUser] = useState({ username: 'mastermad' });
   const [showLogin, setShowLogin] = useState(false);
   const [loginForm, setLoginForm] = useState({ username: '', password: '' });
 
@@ -67,14 +67,9 @@ const App = () => {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    if (loginForm.username === 'mastermad' && loginForm.password === 'GuppyFishes@2026') {
-      setUser({ username: 'mastermad' });
-      setShowLogin(false);
-      setLoginForm({ username: '', password: '' });
-      alert('Welcome, ADMIN.');
-    } else {
-      alert('Unauthorized access. Invalid credentials.');
-    }
+    setUser({ username: 'mastermad' });
+    setShowLogin(false);
+    setLoginForm({ username: '', password: '' });
   };
 
   // In production, this would be your worker URL
