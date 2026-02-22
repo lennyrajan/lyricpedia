@@ -1,4 +1,4 @@
-name = "lyriverse-brain"
+name = "lyricpedia"
 main = "scripts/worker-index.js"
 compatibility_date = "2024-03-01"
 
